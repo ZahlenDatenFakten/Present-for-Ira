@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { differenceInDays, format, isValid, parseISO } from 'date-fns';
 import { ru, enUS } from 'date-fns/locale';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Target, TrendingUp, Calendar, ArrowRight, Settings2, Plus, X, Globe, Sparkles, LayoutGrid, Activity } from 'lucide-react';
+import { Target, TrendingUp, Calendar, ArrowRight, Settings2, Plus, Minus, X, Globe, Sparkles, LayoutGrid, Activity } from 'lucide-react';
 
 interface GoalData {
   goalName: string;
@@ -31,7 +31,7 @@ const dict = {
     overallProgress: "Общий прогресс",
     statusActive: "АКТИВНО",
     completed: "ВЫПОЛНЕНО",
-    addFundsTitle: "ПОПОЛНИТЬ БАЛАНС",
+    updateFundsTitle: "УПРАВЛЕНИЕ БАЛАНСОМ",
     addFundsPlaceholder: "Сумма...",
     remainingTitle: "ОСТАЛОСЬ НАКОПИТЬ",
     deadlineTitle: "ДЕДЛАЙН",
@@ -59,7 +59,7 @@ const dict = {
     overallProgress: "Overall Progress",
     statusActive: "ACTIVE",
     completed: "COMPLETED",
-    addFundsTitle: "ADD FUNDS",
+    updateFundsTitle: "UPDATE BALANCE",
     addFundsPlaceholder: "Amount...",
     remainingTitle: "REMAINING TO GOAL",
     deadlineTitle: "DEADLINE",
@@ -127,11 +127,14 @@ export default function WalletPage() {
     setIsEditing(false);
   };
 
-  const handleAddFunds = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleUpdateFunds = (type: 'add' | 'subtract') => {
     const amount = Number(addAmount);
     if (!isNaN(amount) && amount > 0) {
-      setData(prev => prev ? { ...prev, currentAmount: prev.currentAmount + amount } : prev);
+      setData(prev => {
+        if (!prev) return prev;
+        const newAmount = type === 'add' ? prev.currentAmount + amount : prev.currentAmount - amount;
+        return { ...prev, currentAmount: Math.max(0, newAmount) };
+      });
       setAddAmount('');
     }
   };
@@ -250,24 +253,28 @@ export default function WalletPage() {
 
           {/* Right Column: Actions & Remaining */}
           <div className="md:col-span-4 flex flex-col gap-6">
-            {/* Quick Add Funds */}
+            {/* Quick Update Funds */}
             <div className="glass-panel p-8 flex-1 flex flex-col justify-center group hover:border-blue-500/30 transition-colors duration-500">
               <div className="font-inter text-xs font-medium uppercase tracking-[0.2em] text-white/50 mb-6 flex items-center gap-2">
-                <Plus size={16} className="text-blue-400" />
-                {t.addFundsTitle}
+                <Activity size={16} className="text-blue-400" />
+                {t.updateFundsTitle}
               </div>
-              <form onSubmit={handleAddFunds} className="flex gap-3">
+              <div className="flex gap-3">
                 <input 
                   type="number" 
                   value={addAmount}
                   onChange={(e) => setAddAmount(e.target.value)}
                   placeholder={t.addFundsPlaceholder}
                   className="glass-input w-full px-4 py-3 font-inter text-sm"
+                  onKeyDown={(e) => { if (e.key === 'Enter') handleUpdateFunds('add'); }}
                 />
-                <button type="submit" disabled={!addAmount} className="bg-gradient-to-br from-blue-500 to-purple-600 text-white px-5 rounded-xl font-inter flex items-center justify-center hover:opacity-90 hover:shadow-[0_0_20px_rgba(59,130,246,0.4)] transition-all disabled:opacity-50 disabled:grayscale">
+                <button onClick={() => handleUpdateFunds('subtract')} disabled={!addAmount} className="bg-gradient-to-br from-pink-500 to-rose-600 text-white px-4 rounded-xl font-inter flex items-center justify-center hover:opacity-90 hover:shadow-[0_0_20px_rgba(244,63,94,0.4)] transition-all disabled:opacity-50 disabled:grayscale">
+                  <Minus size={20} />
+                </button>
+                <button onClick={() => handleUpdateFunds('add')} disabled={!addAmount} className="bg-gradient-to-br from-blue-500 to-purple-600 text-white px-4 rounded-xl font-inter flex items-center justify-center hover:opacity-90 hover:shadow-[0_0_20px_rgba(59,130,246,0.4)] transition-all disabled:opacity-50 disabled:grayscale">
                   <Plus size={20} />
                 </button>
-              </form>
+              </div>
             </div>
 
             {/* Remaining Amount */}
