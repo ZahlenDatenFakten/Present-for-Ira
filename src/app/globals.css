@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Colors */
+    --color-void-black: #000000;
+    --color-carbon: #060606;
+    --color-graphite: #252525;
+    --color-onyx: #1f1f1f;
+    --color-iron: #313131;
+    --color-slate: #3d3d3d;
+    --color-fog: #525252;
+    --color-ash: #7a7a7a;
+    --color-smoke: #8a8a8a;
+    --color-pearl: #c5c5c5;
+    --color-bone: #e5e5e5;
+    --color-chalk: #ffffff;
+    --color-signal-lime: #c5ff4a;
+    --color-olive-depth: #597321;
+    --color-moss-shadow: #314013;
+  }
+
+  body {
+    background-color: var(--color-carbon);
+    color: var(--color-bone);
+  }
+
+  /* Form reset styles for dark theme */
+  input, textarea, select {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: inherit;
+  }
+}
+
+@layer utilities {
+  .text-glow {
+    text-shadow: 0 0 8px rgba(197, 255, 74, 0.45);
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
